@@ -15,14 +15,13 @@ class GameState:
         self.played_stack = []
         self.crib = []
         self.phases = [self.re_shuffle, self.deal, self.make_crib, self.cut, self.start]
-        self.phase_number = 0
         self.dealer = self.player1.id
 
     def play(self):
         print('Welcome to Cribbage :)')
         while self.player1.score <= 121 and self.player2.score <= 121:
-            self.phases[self.phase_number]()
-            self.phase_number += 1
+            for i in range(len(self.phases)):
+                self.phases[i]()
 
     def re_shuffle(self):
         self.deck = Deck.shuffled()
@@ -62,8 +61,19 @@ class GameState:
 
     def start(self):
         print('let the game begin')
-        pass
-
-
-
-        
+        all_go = False
+        limit_reached = False
+        # TODO: player 2 should not always go first
+        player_queue = [self.player2, self.player1]
+        the_count = 0
+        while not all_go or limit_reached:
+            print(f"the count is {the_count}")
+            current_player = player_queue.pop(0)
+            print(current_player)
+            # TODO: check if the current player has to "go" / filter invalid cards to play when gathering input
+            card_played = current_player.hand.pop(int(input("Play a card from your hand (enter the index of the card - first card is 0)")))
+            self.played_stack.append(card_played)
+            print(f"{card_played} was played.")
+            the_count += card_played.rank.points()
+            # check if the count has been reached, add appropriate points scoring-wise
+            player_queue.append(current_player)

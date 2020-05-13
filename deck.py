@@ -11,7 +11,7 @@ class Suit(Enum):
         return self.value
 
 class Rank(Enum):
-    ACE = 0
+    ACE = 1
     TWO = 2
     THREE = 3
     FOUR = 4
@@ -24,6 +24,11 @@ class Rank(Enum):
     JACK = 11
     QUEEN = 12
     KING = 13
+
+    def points(self):
+        if self in [Rank.JACK, Rank.QUEEN, Rank.KING]:
+            return 10
+        return self.value
 
     def __str__(self):
         if self.value == Rank.ACE.value:
