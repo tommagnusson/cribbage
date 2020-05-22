@@ -75,10 +75,8 @@ class GameState:
         print('The crib has been created.')
 
     def cut(self):
-        cut_number = int(self.input(
-            f'Player {self.player1.id}, please select a number between 5 and {len(self.deck)} to cut the deck'))
-        self.center_card = self.deck[cut_number]
-        print(f'The center card is {self.center_card}')
+        print("Please select a number to cut the deck by...")
+        print(f"The center card is {self.select_card(self.deck)}")
 
     def start(self):
         print('let the game begin')
