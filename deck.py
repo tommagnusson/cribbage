@@ -41,9 +41,28 @@ class Rank(Enum):
             return 'K'
 
         return str(self.value)
-
-    def compare(self, r2):
-        return self.value - r2.value
+    
+    def __sub__(self, other):
+        return self.value - other.value 
+    
+    @staticmethod
+    def fromString(s):
+        """
+        From <number>|(J|Q|K|A) format to class
+        """
+        try:
+            return Rank(int(s))
+        except ValueError:
+            # check for one of J, Q, K, A
+            if s == 'A':
+                return Rank(1)
+            if s == 'J':
+                return Rank(11)
+            if s == 'Q':
+                return Rank(12)
+            if s == 'K':
+                return Rank(13)
+        raise ValueError(f"Invalid string: {s}")
 
 class Card:
 
@@ -51,11 +70,26 @@ class Card:
         self.suit = suit
         self.rank = rank
 
+    @staticmethod
+    def from_string(s):
+        """
+        Takes a card formatted as <rank><suit> and creates a card
+        """
+        suit = s[-1]
+        rank = s[:-1]
+        return Card(Suit(suit), Rank.fromString(rank))
+
     def __str__(self):
         return str(self.rank) + str(self.suit)
 
     def __repr__(self):
         return str(self.rank) + str(self.suit)
+    
+    def __sub__(self, other):
+        return self.rank - other.rank 
+
+    def __eq__(self, other):
+        return self.suit == other.suit and self.rank == self.rank
 
 class Deck:
     @staticmethod
@@ -72,3 +106,10 @@ class Deck:
         # shuffle them 
         random.shuffle(cards)
         return cards
+
+    @staticmethod
+    def all_from_string(ss):
+        """
+        Convenience method for Card.from_string over a list of card strings
+        """
+        return [Card.from_string(c) for c in ss]
