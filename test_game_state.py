@@ -67,3 +67,16 @@ class TestGameState(unittest.TestCase):
         card = gs.select_card(gs.player1.hand)
         # Then the first card is returned
         self.assertEqual(card, expected_card)
+
+    def test_filter_playable_cards(self):
+        # Given a count of 25
+        count = 25
+        gs = GameState()
+        # and a hand with some cards that are less than 7 points
+        hand = Deck.all_from_string(
+            ["Q♦", "J♣", "4♦", "10♣", "8♠", "K♠", "6♠"])
+        # When the playable cards are filtered
+        filtered = list(gs.filter_playable_cards(hand, count))
+        # Then all the cards returned are less than 7 points
+        expected_filtered = Deck.all_from_string(["4♦", "6♠"])
+        self.assertEqual(filtered, expected_filtered)
