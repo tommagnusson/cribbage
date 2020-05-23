@@ -80,3 +80,16 @@ class TestGameState(unittest.TestCase):
         # Then all the cards returned are less than 7 points
         expected_filtered = Deck.all_from_string(["4♦", "6♠"])
         self.assertEqual(filtered, expected_filtered)
+
+    def test_filter_playable_cards(self):
+        # Given a count of 31 (too many)
+        count = 31
+        gs = GameState()
+        # and a hand with cards
+        hand = Deck.all_from_string(
+            ["Q♦", "J♣", "4♦", "10♣", "8♠", "K♠", "6♠"])
+        # When the playable cards are filtered
+        filtered = list(gs.filter_playable_cards(hand, count))
+        # Then no cards are played
+        expected = []
+        self.assertEqual(filtered, expected)
