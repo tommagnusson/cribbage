@@ -93,3 +93,16 @@ class TestGameState(unittest.TestCase):
         # Then no cards are played
         expected = []
         self.assertEqual(filtered, expected)
+
+    def test_check_straight(self):
+        # Given an empty straight list
+        gs = GameState()
+        self.assertEqual(gs.straight, [])
+        # When the player plays a new card and the straight is checked
+        played_card = Card.from_string("Q♦")
+        score = gs.check_straight([played_card])
+        # Then no score is returned and that card is in the straight list
+        expected_score = 0
+        expected_straight_list = [played_card]
+        self.assertEqual(score, expected_score)
+        self.assertEqual(gs.straight, expected_straight_list)

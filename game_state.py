@@ -19,6 +19,8 @@ class GameState:
                        self.make_crib, self.cut, self.start]
         self.dealer = self.player1.id
         self.input = inputFn
+        self.straight = []  # used for straight detection in play phase
+        self.matches = []  # used for match detection in play phase
 
     def play(self):
         print('Welcome to Cribbage :)')
@@ -44,8 +46,8 @@ class GameState:
 
     def select_card(self, cards):
         """
-        Prompts the player to select a card from their hand
-        Returns the selected card, which is removed from their hand.
+        Prompts the player to select a card from the cards provided
+        Returns the selected card, which is removed from the list of cards provided
         """
         idx = -1  # should not be inital value
         while True:
@@ -112,16 +114,14 @@ class GameState:
             if c.rank.points() <= needed:
                 yield c
 
-    straight = []
-    matches = []
-
-    def apply_score(self, played_stack, count):
-        score = 0
+    def check_landed_15_or_31(self, count):
         if count == 15 or count == 31:
             # Count is now 31 -> 2 points
             # Count is now 15 -> 2 points
-            score += 2
-        # Previous N are unordered straight (at least 3, three -> 3 points, four -> 4 points, etc)
+            return 2
+        return 0
+
+    def check_straight(self, played_stack):
         straight_queue_len = len(self.straight)
         if straight_queue_len == 0:
             # fill the straight queue
@@ -150,8 +150,13 @@ class GameState:
                 # add to the queue
                 self.straight.append(cmp)
                 # add points for the number of cards in the straight queue
-                score += straight_queue_len + 1  # +1 bc of extra card added
+                return straight_queue_len + 1  # +1 bc of extra card added
+        return 0
 
+    def apply_score(self, played_stack, count):
+        score += self.check_landed_15_or_31(count)
+        # Previous N are unordered straight (at least 3, three -> 3 points, four -> 4 points, etc)
+        score += self.check_straight(played_stack)
         # Previous N are same rank (pair -> 2 points, triplet -> 6 points, quadruplet -> 12)
         matches_len = len(self.matches)
         if matches_len == 0:
