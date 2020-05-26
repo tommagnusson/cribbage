@@ -151,8 +151,14 @@ class GameState:
             if abs(bdiff) == 1 or abs(tdiff) == 1:
                 # add to the queue
                 self.straight.append(cmp)
+                self.straight = sorted(
+                    self.straight, key=lambda c: c.rank.value)
                 # add points for the number of cards in the straight queue
-                return straight_queue_len + 1  # +1 bc of extra card added
+                return len(self.straight)
+            else:
+                # TODO: duplicate code with above
+                self.straight.clear()
+                self.straight.append(played_card)
         return 0
 
     def apply_score(self, played_stack, count):

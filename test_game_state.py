@@ -119,3 +119,18 @@ class TestGameState(unittest.TestCase):
         expected_straight_list = [played_card, Card.from_string("Q♦")]
         self.assertEqual(score, expected_score)
         self.assertEqual(gs.straight, expected_straight_list)
+
+    def test_check_straight_adds_rising_triple(self):
+        # Given a straight list with a rising pair
+        gs = GameState()
+        starting_straight = [Card.from_string("4♠"), Card.from_string("3♠")]
+        gs.straight = starting_straight
+        # When the player plays a new card that is one rank below the lowest card in the pair
+        played_card = Card.from_string("2♦")
+        score = gs.check_straight(played_card)
+        # Then the score returned is 3, and the straight list are ascending
+        expected_score = 3
+        expected_straight_list = [
+            played_card, Card.from_string("3♠"), Card.from_string("4♠")]
+        self.assertEqual(score, expected_score)
+        self.assertEqual(gs.straight, expected_straight_list)

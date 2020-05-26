@@ -64,7 +64,7 @@ class Rank(Enum):
                 return Rank(12)
             if s == 'K':
                 return Rank(13)
-        raise ValueError(f"Invalid string: {s}")
+        raise ValueError(f"Invalid card string: {s}")
 
 
 class Card:
