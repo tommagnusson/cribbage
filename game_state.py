@@ -121,29 +121,31 @@ class GameState:
             return 2
         return 0
 
-    def check_straight(self, played_stack):
+    def check_straight(self, played_card):
         straight_queue_len = len(self.straight)
         if straight_queue_len == 0:
             # fill the straight queue
-            self.straight.append(played_stack[-1])
+            self.straight.append(played_card)
         elif straight_queue_len == 1:
             # if it could be a straight then keep it going
             cmp = self.straight[0]
-            diff = cmp - played_stack[-1]
+            diff = cmp - played_card
             if abs(diff) == 1:
                 # it's potentially a straight... keep the straight queue going
-                self.straight.append(played_stack[-1])
-                self.straight.sort()  # for easier checking
+                self.straight.append(played_card)
+                # for easier checking
+                self.straight = sorted(
+                    self.straight, key=lambda c: c.rank.value)
             else:
                 # no straight, reset the queue
                 self.straight.clear()
                 # because it could still be this card in it, just reset the rest though
-                self.straight.append(played_stack[-1])
+                self.straight.append(played_card)
         else:  # straight queue has at least 2 cards in it
             # check the bottom and top completion next
             bot = self.straight[0]
             top = self.straight[-1]
-            cmp = self.played_stack[-1]
+            cmp = played_card
             bdiff = cmp - bot
             tdiff = cmp - top
             if abs(bdiff) == 1 or abs(tdiff) == 1:
@@ -156,7 +158,7 @@ class GameState:
     def apply_score(self, played_stack, count):
         score += self.check_landed_15_or_31(count)
         # Previous N are unordered straight (at least 3, three -> 3 points, four -> 4 points, etc)
-        score += self.check_straight(played_stack)
+        score += self.check_straight(played_stack[-1])
         # Previous N are same rank (pair -> 2 points, triplet -> 6 points, quadruplet -> 12)
         matches_len = len(self.matches)
         if matches_len == 0:

@@ -1,6 +1,7 @@
 from enum import Enum
 import random
 
+
 class Suit(Enum):
     HEARTS = '♥'
     SPADES = '♠'
@@ -9,6 +10,7 @@ class Suit(Enum):
 
     def __str__(self):
         return self.value
+
 
 class Rank(Enum):
     ACE = 1
@@ -41,10 +43,10 @@ class Rank(Enum):
             return 'K'
 
         return str(self.value)
-    
+
     def __sub__(self, other):
-        return self.value - other.value 
-    
+        return self.value - other.value
+
     @staticmethod
     def fromString(s):
         """
@@ -63,6 +65,7 @@ class Rank(Enum):
             if s == 'K':
                 return Rank(13)
         raise ValueError(f"Invalid string: {s}")
+
 
 class Card:
 
@@ -84,12 +87,13 @@ class Card:
 
     def __repr__(self):
         return str(self.rank) + str(self.suit)
-    
+
     def __sub__(self, other):
-        return self.rank - other.rank 
+        return self.rank - other.rank
 
     def __eq__(self, other):
         return self.suit == other.suit and self.rank == self.rank
+
 
 class Deck:
     @staticmethod
@@ -103,7 +107,7 @@ class Deck:
             for rank in Rank:
                 cards.append(Card(suit, rank))
 
-        # shuffle them 
+        # shuffle them
         random.shuffle(cards)
         return cards
 

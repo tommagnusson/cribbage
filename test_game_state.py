@@ -94,15 +94,28 @@ class TestGameState(unittest.TestCase):
         expected = []
         self.assertEqual(filtered, expected)
 
-    def test_check_straight(self):
+    def test_check_straight_adds_single_card(self):
         # Given an empty straight list
         gs = GameState()
         self.assertEqual(gs.straight, [])
         # When the player plays a new card and the straight is checked
         played_card = Card.from_string("Q♦")
-        score = gs.check_straight([played_card])
+        score = gs.check_straight(played_card)
         # Then no score is returned and that card is in the straight list
         expected_score = 0
         expected_straight_list = [played_card]
+        self.assertEqual(score, expected_score)
+        self.assertEqual(gs.straight, expected_straight_list)
+
+    def test_check_straight_adds_rising_pair(self):
+        # Given a straight list with a card
+        gs = GameState()
+        gs.straight = [Card.from_string("Q♦")]
+        # When the player plays a new card that is one rank below the existing card, with a different suit (suit doesn't matter)
+        played_card = Card.from_string("J♣")
+        score = gs.check_straight(played_card)
+        # Then no score is returned, and both cards are still in the straight list, sorted in ascending order
+        expected_score = 0
+        expected_straight_list = [played_card, Card.from_string("Q♦")]
         self.assertEqual(score, expected_score)
         self.assertEqual(gs.straight, expected_straight_list)
