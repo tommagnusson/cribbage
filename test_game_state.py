@@ -162,3 +162,17 @@ class TestGameState(unittest.TestCase):
         expected_straight_list = Deck.all_from_string(["6♦"])
         self.assertEqual(score, expected_score)
         self.assertEqual(gs.straight, expected_straight_list)
+
+    def test_check_match_single_played_card(self):
+        # Given an empty match list
+        gs = GameState()
+        starting_matches = []
+        gs.matches = starting_matches
+        # When the player plays a new card
+        played_card = Card.from_string("3♣")
+        score = gs.check_match(played_card)
+        # Then the score returned is 0, and the match list contains that one card
+        expected_score = 0
+        expected_matches_list = [played_card]
+        self.assertEqual(score, expected_score)
+        self.assertEqual(gs.matches, expected_matches_list)

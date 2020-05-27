@@ -149,24 +149,27 @@ class GameState:
                 self.straight.append(played_card)
         return 0
 
+    def check_match(self, played_card):
+        matches_len = len(self.matches)
+        if matches_len == 0:
+            self.matches.append(played_card)  # add the last
+        else:  # matches has at least one card, lets see if rank matches
+            cmp = self.matches[0]
+            if cmp.rank == played_card.rank:
+                # add to the matches, add the points
+                self.matches.append(played_card)
+                # a[n] = n^2 + n is [2,6,12...]
+                return matches_len + matches_len**2
+            else:
+                self.matches.clear()
+                # still might have the last played card to start somthing
+                self.matches.append(played_card)
+        return 0
+
     def apply_score(self, played_stack, count):
         score += self.check_landed_15_or_31(count)
         # Previous N are unordered straight (at least 3, three -> 3 points, four -> 4 points, etc)
         score += self.check_straight(played_stack[-1])
         # Previous N are same rank (pair -> 2 points, triplet -> 6 points, quadruplet -> 12)
-        matches_len = len(self.matches)
-        if matches_len == 0:
-            self.matches.append(played_stack[-1])  # add the last
-        else:  # matches has at least one card, lets see if rank matches
-            cmp = self.matches[0]
-            if cmp.rank == played_stack[-1].rank:
-                # add to the matches, add the points
-                self.matches.append(played_stack[-1])
-                # a[n] = n^2 + n is [2,6,12...]
-                score += matches_len + matches_len**2
-            else:
-                self.matches.clear()
-                # still might have the last played card to start somthing
-                self.matches.append(played_stack[-1])
-
+        score += self.check_match(played_stack[-1])
         return score
