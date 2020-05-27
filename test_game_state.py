@@ -176,3 +176,17 @@ class TestGameState(unittest.TestCase):
         expected_matches_list = [played_card]
         self.assertEqual(score, expected_score)
         self.assertEqual(gs.matches, expected_matches_list)
+
+    def test_check_match_two_matched_cards(self):
+        # Given a match list with one card
+        gs = GameState()
+        starting_matches = [Card.from_string("3♣")]
+        gs.matches = starting_matches
+        # When the player plays a card with the same rank
+        played_card = Card.from_string("3♦")
+        score = gs.check_match(played_card)
+        # Then the score returned is 2, and the match list contains the played card
+        expected_score = 2
+        expected_matches_list = Deck.all_from_string(["3♣", "3♦"])
+        self.assertEqual(score, expected_score)
+        self.assertEqual(gs.matches, expected_matches_list)
