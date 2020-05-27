@@ -148,3 +148,17 @@ class TestGameState(unittest.TestCase):
         expected_straight_list = Deck.all_from_string(["A♦", "2♦", "3♠", "4♠"])
         self.assertEqual(score, expected_score)
         self.assertEqual(gs.straight, expected_straight_list)
+
+    def test_check_straight_breaks_straight(self):
+        # Given a straight list with a triple
+        gs = GameState()
+        starting_straight = Deck.all_from_string(["2♦", "3♠", "4♠"])
+        gs.straight = starting_straight
+        # When the player plays a new card that break the straight
+        played_card = Card.from_string("6♦")
+        score = gs.check_straight(played_card)
+        # Then the score returned is 0, and the straight list contains only that newly played card
+        expected_score = 0
+        expected_straight_list = Deck.all_from_string(["6♦"])
+        self.assertEqual(score, expected_score)
+        self.assertEqual(gs.straight, expected_straight_list)

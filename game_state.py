@@ -122,9 +122,9 @@ class GameState:
         return 0
 
     def check_straight(self, played_card):
-        straight_queue_len = len(self.straight)
-        if straight_queue_len == 0:
-            # fill the straight queue
+        straight_len = len(self.straight)
+        if straight_len == 0:
+            # fill the straight list
             self.straight.append(played_card)
         else:  # straight queue has at least 1 card in it
             # check the bottom and top completion next
@@ -134,11 +134,11 @@ class GameState:
             bdiff = cmp - bot
             tdiff = cmp - top
             if abs(bdiff) == 1 or abs(tdiff) == 1:
-                # add to the queue
+                # add to the list
                 self.straight.append(cmp)
                 self.straight = sorted(
                     self.straight, key=lambda c: c.rank.value)
-                # add points for the number of cards in the straight queue
+                # add points for the number of cards in the straight list
                 # unless there are only two cards in there
                 pts = len(self.straight)
                 return pts if pts > 2 else 0
