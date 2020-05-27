@@ -190,3 +190,17 @@ class TestGameState(unittest.TestCase):
         expected_matches_list = Deck.all_from_string(["3♣", "3♦"])
         self.assertEqual(score, expected_score)
         self.assertEqual(gs.matches, expected_matches_list)
+
+    def test_check_match_break_card(self):
+        # Given a match list with one card
+        gs = GameState()
+        starting_matches = [Card.from_string("K♦")]
+        gs.matches = starting_matches
+        # When the player plays a card with a different rank
+        played_card = Card.from_string("A♦")
+        score = gs.check_match(played_card)
+        # The the score returned is 0, and the match contains just the newly played card
+        expected_score = 0
+        expected_matches_list = [played_card]
+        self.assertEqual(score, expected_score)
+        self.assertEqual(gs.matches, expected_matches_list)

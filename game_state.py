@@ -105,7 +105,7 @@ class GameState:
             print(f"{card_played} was played for {card_played.rank.points()} points.")
             the_count += card_played.rank.points()
             current_player.score += self.apply_score(
-                self.played_stack, the_count)
+                card_played, the_count)
             player_queue.append(current_player)
 
     def filter_playable_cards(self, hand, count):
@@ -166,10 +166,10 @@ class GameState:
                 self.matches.append(played_card)
         return 0
 
-    def apply_score(self, played_stack, count):
+    def apply_score(self, played_card, count):
         score += self.check_landed_15_or_31(count)
         # Previous N are unordered straight (at least 3, three -> 3 points, four -> 4 points, etc)
-        score += self.check_straight(played_stack[-1])
+        score += self.check_straight(played_card)
         # Previous N are same rank (pair -> 2 points, triplet -> 6 points, quadruplet -> 12)
-        score += self.check_match(played_stack[-1])
+        score += self.check_match(played_card)
         return score
