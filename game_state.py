@@ -126,22 +126,7 @@ class GameState:
         if straight_queue_len == 0:
             # fill the straight queue
             self.straight.append(played_card)
-        elif straight_queue_len == 1:
-            # if it could be a straight then keep it going
-            cmp = self.straight[0]
-            diff = cmp - played_card
-            if abs(diff) == 1:
-                # it's potentially a straight... keep the straight queue going
-                self.straight.append(played_card)
-                # for easier checking
-                self.straight = sorted(
-                    self.straight, key=lambda c: c.rank.value)
-            else:
-                # no straight, reset the queue
-                self.straight.clear()
-                # because it could still be this card in it, just reset the rest though
-                self.straight.append(played_card)
-        else:  # straight queue has at least 2 cards in it
+        else:  # straight queue has at least 1 card in it
             # check the bottom and top completion next
             bot = self.straight[0]
             top = self.straight[-1]
@@ -154,9 +139,12 @@ class GameState:
                 self.straight = sorted(
                     self.straight, key=lambda c: c.rank.value)
                 # add points for the number of cards in the straight queue
-                return len(self.straight)
+                # unless there are only two cards in there
+                pts = len(self.straight)
+                return pts if pts > 2 else 0
             else:
-                # TODO: duplicate code with above
+                # straight broken, clear straight list
+                # add played card because it might be part of a subsequent straight
                 self.straight.clear()
                 self.straight.append(played_card)
         return 0
