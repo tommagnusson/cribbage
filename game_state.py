@@ -11,6 +11,7 @@ class GameState:
         self.player1 = Player()
         self.player2 = Player()
         self.deck = Deck.shuffled()
+        self.played_by_player = {}
 
         self.center_card = None
         self.played_stack = []
@@ -35,8 +36,8 @@ class GameState:
         return [self.deck.pop(0) for ind in range(6)]
 
     def deal(self):
-        self.player1.hand = self.deal_hand()
-        self.player2.hand = self.deal_hand()
+        self.player1.deal(self.deal_hand())
+        self.player2.deal(self.deal_hand())
 
     def prompt_crib(self, player):
         print("Lay away...")
