@@ -204,3 +204,12 @@ class TestGameState(unittest.TestCase):
         expected_matches_list = [played_card]
         self.assertEqual(score, expected_score)
         self.assertEqual(gs.matches, expected_matches_list)
+
+    def test_score_meld_15(self):
+        # Given a meld that adds up to 15
+        gs = GameState()
+        meld = (Card.from_string("5♦"), Card.from_string("J♣"))
+        # When the meld is scored
+        score = gs.score_meld(meld)
+        # The returned score is 2
+        self.assertEqual(score, 2)

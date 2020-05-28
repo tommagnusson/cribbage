@@ -3,6 +3,7 @@ import random
 from deck import Deck
 from player import Player
 from queue import Queue
+from itertools import chain, combinations
 
 
 class GameState:
@@ -11,13 +12,12 @@ class GameState:
         self.player1 = Player()
         self.player2 = Player()
         self.deck = Deck.shuffled()
-        self.played_by_player = {}
 
         self.center_card = None
         self.played_stack = []
         self.crib = []
         self.phases = [self.re_shuffle, self.deal,
-                       self.make_crib, self.cut, self.start]
+                       self.make_crib, self.cut, self.start, self.peg]
         self.dealer = self.player1.id
         self.input = inputFn
         self.straight = []  # used for straight detection in play phase
@@ -36,14 +36,16 @@ class GameState:
         return [self.deck.pop(0) for ind in range(6)]
 
     def deal(self):
-        self.player1.deal(self.deal_hand())
-        self.player2.deal(self.deal_hand())
+        self.player1.hand = self.deal_hand()
+        self.player2.hand = self.deal_hand()
 
     def prompt_crib(self, player):
         print("Lay away...")
         self.crib.append(self.select_card(player.hand))
         print("Lay away...")
         self.crib.append(self.select_card(player.hand))
+        # For scoring later
+        player.original_hand = player.hand
 
     def select_card(self, cards):
         """
@@ -83,25 +85,21 @@ class GameState:
 
     def start(self):
         print('let the game begin')
-        all_go = False
-        limit_reached = False
         # TODO: player 2 should not always go first
         player_queue = [self.player2, self.player1]
         the_count = 0
         while True:
-            print(f"the count is {the_count}")
+            print(f"The count is {the_count}")
             current_player = player_queue.pop(0)
             print(current_player)
             playable_cards = list(self.filter_playable_cards(
                 current_player.hand, the_count))
             if len(playable_cards) == 0:
                 print("GO")
-                # TODO: the other player gets a point
+                player_queue[0].score += 1
+                player_queue.append(current_player)
                 break
-            print(f"Play any of these: {playable_cards}")
-            # TODO: sanitize input from user
-            card_played = current_player.hand.pop(int(self.input(
-                "Play a card from your hand (enter the index of the card - first card is 0)")))
+            card_played = self.select_card(playable_cards)
             self.played_stack.append(card_played)
             print(f"{card_played} was played for {card_played.rank.points()} points.")
             the_count += card_played.rank.points()
@@ -119,6 +117,7 @@ class GameState:
         if count == 15 or count == 31:
             # Count is now 31 -> 2 points
             # Count is now 15 -> 2 points
+            print(f"Landed on {count} -> 2 points!")
             return 2
         return 0
 
@@ -142,7 +141,11 @@ class GameState:
                 # add points for the number of cards in the straight list
                 # unless there are only two cards in there
                 pts = len(self.straight)
-                return pts if pts > 2 else 0
+                if pts > 2:
+                    print(f"Straight! {self.straight} -> {pts} points")
+                    return pts
+                else:
+                    return 0
             else:
                 # straight broken, clear straight list
                 # add played card because it might be part of a subsequent straight
@@ -160,7 +163,10 @@ class GameState:
                 # add to the matches, add the points
                 self.matches.append(played_card)
                 # a[n] = n^2 + n is [2,6,12...]
-                return matches_len + matches_len**2
+                pts = matches_len + matches_len**2
+                if pts > 0:
+                    print(f"Match! {self.matches} -> {pts} points")
+                return pts
             else:
                 self.matches.clear()
                 # still might have the last played card to start somthing
@@ -174,3 +180,91 @@ class GameState:
         # Previous N are same rank (pair -> 2 points, triplet -> 6 points, quadruplet -> 12)
         score += self.check_match(played_card)
         return score
+
+    def peg(self):
+        """
+        Scores the cards in the original hands, in conjunction with
+        the top card from the deck
+        """
+        self.player1.score += self.score(
+            self.player1.original_hand, self.top_card)
+        # TODO: Score player 2
+        # TODO: Score crib
+
+    def score(self, hand, top_card):
+        """
+        Finds all of the permutations of the hand and top card to find the score for the hand.
+        """
+        powerset = GameState.powerset(list(hand).append(top_card))
+        score = 0
+        for meld in powerset:
+            score += self.score_meld(meld)
+        return score
+
+    def score_meld(self, meld):
+        """
+        Takes one subset tuple (meld) of the hand and returns the score
+        """
+        if type(meld) is not tuple:
+            raise TypeError("Meld should be type tuple.")
+        if len(meld) < 2:
+            raise ValueError(
+                f"Meld {meld} has a length {len(meld)}. It should be higher than 1.")
+        score = 0
+        # Check adds to 15
+        tmp = 0
+        for c in meld:
+            tmp += c.rank.points()
+        if tmp == 15:
+            print(f"Adds to 15! {meld} -> 2 points")
+            score += 2
+        # Check a straight
+        if len(meld) > 2:
+            s = sorted(meld)
+            t = None
+            is_straight = True
+            for c in s:
+                if t is None:
+                    t = c
+                    continue
+                if t is not None and t.rank - c.rank != 1:
+                    is_straight = False
+                    break
+            if is_straight:
+                score += len(meld)
+                print(f"Straight! {meld} -> {len(meld)} points")
+        # Check a match
+        r = meld[0].rank
+        is_match = True
+        for c in meld:
+            if c.rank != r:
+                is_match = False
+        if is_match:
+            pts = len(meld)-1 + (len(meld)-1)**2
+            print(f"Match! {meld} -> {pts} points")
+            score += pts
+        # Check flush
+        if len(meld) == 4:
+            s = meld[0].suit
+            is_flush = True
+            for c in meld:
+                if c.suit != s:
+                    is_flush = False
+            if is_flush:
+                print(f"Flush! {meld} -> 4 points")
+                score += 4
+        return score
+
+    def reset(self):
+        """
+        Resets all of the current game state to ready it for the next round
+        """
+        pass
+
+    def powerset(iterable):
+        """
+        Modified powerset that skips the null set and singleton sets
+        powerset([1,2,3]) --> (1,2) (1,3) (2,3) (1,2,3)
+        """
+        s = list(iterable)
+        return chain.from_iterable(combinations(s, r) for r in range(2, len(s)+1))
