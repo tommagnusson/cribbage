@@ -220,19 +220,21 @@ class GameState:
             score += 2
         # Check a straight
         if len(meld) > 2:
-            s = sorted(meld)
+            s = sorted(meld, key=lambda c: c.rank.value)
             t = None
             is_straight = True
             for c in s:
                 if t is None:
                     t = c
                     continue
-                if t is not None and t.rank - c.rank != 1:
+                if c.rank - t.rank != 1:
                     is_straight = False
                     break
+                else:
+                    t = c  # update rolling pairs
             if is_straight:
-                score += len(meld)
                 print(f"Straight! {meld} -> {len(meld)} points")
+                score += len(meld)
         # Check a match
         r = meld[0].rank
         is_match = True

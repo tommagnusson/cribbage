@@ -213,3 +213,23 @@ class TestGameState(unittest.TestCase):
         score = gs.score_meld(meld)
         # The returned score is 2
         self.assertEqual(score, 2)
+
+    def test_score_meld_nothing(self):
+        # Given a meld that has no value
+        gs = GameState()
+        meld = (Card.from_string("4♦"), Card.from_string("J♣"))
+        # When the meld is scored
+        score = gs.score_meld(meld)
+        # The returned score is 0
+        self.assertEqual(score, 0)
+
+    def test_score_meld_straight(self):
+        pass
+        # Given a meld that has a straight of three cards of different suits
+        gs = GameState()
+        meld = (Card.from_string("3♦"), Card.from_string(
+            "2♣"), Card.from_string("4♦"))
+        # When the meld is scored
+        score = gs.score_meld(meld)
+        # The returned score is 3
+        self.assertEqual(score, 3)
