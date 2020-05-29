@@ -224,7 +224,6 @@ class TestGameState(unittest.TestCase):
         self.assertEqual(score, 0)
 
     def test_score_meld_straight(self):
-        pass
         # Given a meld that has a straight of three cards of different suits
         gs = GameState()
         meld = (Card.from_string("3♦"), Card.from_string(
@@ -233,3 +232,26 @@ class TestGameState(unittest.TestCase):
         score = gs.score_meld(meld)
         # The returned score is 3
         self.assertEqual(score, 3)
+
+    def test_score_meld_match_triplet(self):
+        # Given a meld that has a three of a kind
+        gs = GameState()
+        meld = tuple(Deck.all_from_string(["2♠", "2♦", "2♥"]))
+        # When the meld is scored
+        score = gs.score_meld(meld)
+        # The returned score is 2 + 2 + 2 = 6
+        self.assertEqual(score, 6)
+
+    def test_score_meld_match_quad(self):
+        # Given a meld that has a three of a kind
+        gs = GameState()
+        meld = tuple(Deck.all_from_string(["2♠", "2♦", "2♥", "2♣"]))
+        # When the meld is scored
+        score = gs.score_meld(meld)
+        # The returned score is 12
+        self.assertEqual(score, 12)
+
+
+"""
+♠♦♥♣ 
+"""
