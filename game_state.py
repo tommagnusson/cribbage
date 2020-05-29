@@ -212,10 +212,7 @@ class GameState:
                 f"Meld {meld} has a length {len(meld)}. It should be higher than 1.")
         score = 0
         # Check adds to 15
-        tmp = 0
-        for c in meld:
-            tmp += c.rank.points()
-        if tmp == 15:
+        if sum([c.rank.points() for c in meld]) == 15:
             print(f"Adds to 15! {meld} -> 2 points")
             score += 2
         # Check a straight
@@ -235,24 +232,14 @@ class GameState:
             if is_straight:
                 print(f"Straight! {meld} -> {len(meld)} points")
                 score += len(meld)
-        # Check a match
-        r = meld[0].rank
-        is_match = True
-        for c in meld:
-            if c.rank != r:
-                is_match = False
-        if is_match:
-            pts = len(meld)-1 + (len(meld)-1)**2
-            print(f"Match! {meld} -> {pts} points")
-            score += pts
+        # Check a match, only a pair...
+        if len(meld) == 2 and meld[0].rank == meld[1].rank:
+            print(f"Match! {meld} -> 2 points")
+            score += 2
         # Check flush
-        if len(meld) == 4:
+        if len(meld) >= 4:
             s = meld[0].suit
-            is_flush = True
-            for c in meld:
-                if c.suit != s:
-                    is_flush = False
-            if is_flush:
+            if all(c.suit == s for c in meld):
                 print(f"Flush! {meld} -> 4 points")
                 score += 4
         return score

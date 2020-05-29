@@ -233,25 +233,25 @@ class TestGameState(unittest.TestCase):
         # The returned score is 3
         self.assertEqual(score, 3)
 
-    def test_score_meld_match_triplet(self):
-        # Given a meld that has a three of a kind
+    def test_score_meld_match_pair(self):
+        # Given a meld with a matching pair (two cards of same rank)
         gs = GameState()
-        meld = tuple(Deck.all_from_string(["2♠", "2♦", "2♥"]))
+        meld = tuple(Deck.all_from_string(["2♦", "2♦"]))
         # When the meld is scored
         score = gs.score_meld(meld)
-        # The returned score is 2 + 2 + 2 = 6
-        self.assertEqual(score, 6)
+        # Then the score returned is 2
+        self.assertEqual(score, 2)
 
-    def test_score_meld_match_quad(self):
-        # Given a meld that has a three of a kind
+    def test_score_meld_flush(self):
+        # Given a meld with four cards of the same suit
         gs = GameState()
-        meld = tuple(Deck.all_from_string(["2♠", "2♦", "2♥", "2♣"]))
+        meld = tuple(Deck.all_from_string(["3♠", "7♠", "4♠", "5♠"]))
         # When the meld is scored
         score = gs.score_meld(meld)
-        # The returned score is 12
-        self.assertEqual(score, 12)
+        # Then the score returned is 4
+        self.assertEqual(score, 4)
 
 
 """
-♠♦♥♣ 
+♠♥♦♣ 
 """
