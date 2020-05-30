@@ -18,7 +18,7 @@ class GameState:
         self.crib = []
         self.phases = [self.re_shuffle, self.deal,
                        self.make_crib, self.cut, self.start, self.peg]
-        self.dealer = self.player1.id
+        self.dealer = self.player1
         self.input = inputFn
         self.straight = []  # used for straight detection in play phase
         self.matches = []  # used for match detection in play phase
@@ -188,8 +188,9 @@ class GameState:
         """
         self.player1.score += self.score(
             self.player1.original_hand, self.top_card)
-        # TODO: Score player 2
-        # TODO: Score crib
+        self.player2.score += self.score(
+            self.player2.original_hand, self.top_card)
+        self.dealer.score += self.score(self.crib, self.top_card)
 
     def score(self, hand, top_card):
         """
@@ -237,7 +238,7 @@ class GameState:
             print(f"Match! {meld} -> 2 points")
             score += 2
         # Check flush
-        if len(meld) >= 4:
+        if len(meld) == 4:
             s = meld[0].suit
             if all(c.suit == s for c in meld):
                 print(f"Flush! {meld} -> 4 points")

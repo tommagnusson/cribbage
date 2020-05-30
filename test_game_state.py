@@ -251,7 +251,4 @@ class TestGameState(unittest.TestCase):
         # Then the score returned is 4
         self.assertEqual(score, 4)
 
-
-"""
-♠♥♦♣ 
-"""
+# ♠♥♦♣
