@@ -85,8 +85,8 @@ class GameState:
 
     def start(self):
         print('let the game begin')
-        # TODO: player 2 should not always go first
-        player_queue = [self.player2, self.player1]
+        player_queue = [self.player2, self.player1] if self.dealer == self.player1 else [
+            self.player1, self.player1]
         the_count = 0
         while True:
             print(f"The count is {the_count}")
@@ -249,7 +249,15 @@ class GameState:
         """
         Resets all of the current game state to ready it for the next round
         """
-        pass
+        # Switch who is dealer
+        self.dealer = self.player2 if self.dealer == self.player1 else self.player1
+        # Reset deck (shuffle?)
+        self.deck = []
+        # Reset straight and match lists
+        self.straight = []
+        self.matches = []
+        # Reset crib
+        self.crib = []
 
     def powerset(iterable):
         """
